@@ -1,38 +1,53 @@
-# 1. Base image
+# ================================
+# 1. Builder stage
+# ================================
 FROM node:18-alpine AS builder
 
-# 2. Set working directory
+# Set working directory
 WORKDIR /app
 
-# 3. Copy dependencies
-COPY package*.json ./
+# Install required packages (like sharp for image optimization)
+RUN apk add --no-cache libc6-compat
 
-# 4. Install dependencies
+# Copy dependency files
+COPY package.json package-lock.json* ./
+
+# Install dependencies
 RUN npm install
 
-# 5. Copy rest of the project
+# Copy the rest of the application
 COPY . .
 
-# 6. Build project
+# Build the app
 RUN npm run build
 
-# 7. Production image
-FROM node:18-alpine
+# ================================
+# 2. Production stage
+# ================================
+FROM node:18-alpine AS runner
 
+# Set working directory
 WORKDIR /app
 
-# Copy only necessary files
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
+# Install required packages
+RUN apk add --no-cache libc6-compat
 
-# Only copy if these files exist (they should be in root)
-COPY --from=builder /app/next.config.js ./ 
-COPY --from=builder /app/tsconfig.json ./ 
+# Set NODE_ENV for production
+ENV NODE_ENV=production
+
+# Copy only necessary files from builder
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/next.config.mjs ./next.config.mjs
+COPY --from=builder /app/postcss.config.mjs ./postcss.config.mjs
+COPY --from=builder /app/tailwind.config.ts ./tailwind.config.ts
+COPY --from=builder /app/next-env.d.ts ./next-env.d.ts
 
 # Expose port
 EXPOSE 3000
 
-# Run the app
+# Start the Next.js app
 CMD ["npm", "run", "start"]
