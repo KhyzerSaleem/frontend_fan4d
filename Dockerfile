@@ -27,9 +27,9 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/node_modules ./node_modules
 
-# If using Next 13/14 with app router:
-COPY --from=builder /app/next.config.js ./
-COPY --from=builder /app/tsconfig.json ./
+# Only copy if these files exist (they should be in root)
+COPY --from=builder /app/next.config.js ./ 
+COPY --from=builder /app/tsconfig.json ./ 
 
 # Expose port
 EXPOSE 3000
