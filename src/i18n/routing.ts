@@ -6,11 +6,7 @@ export type Locale = (typeof LOCALES)[number];
 
 export const routing = defineRouting({
   locales: LOCALES,
-  defaultLocale: 'ar',
-  messages: {
-    en: () => import('./messages/en.json'),
-    ar: () => import('./messages/ar.json')
-  }
+  defaultLocale: 'ar'
 });
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =
