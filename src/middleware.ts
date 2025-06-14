@@ -28,11 +28,13 @@ export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Extract locale prefix if present
-  const defaultLocale = 'en'; // match your next-intl config
+ const defaultLocale = 'en'; // match your next-intl config
+const localePattern = `^/(${LOCALES.join("|")})(?=/|$)`;
 const match = pathname.match(new RegExp(localePattern));
 const locale = match?.[1] || defaultLocale;
 const localePrefix = `/${locale}`;
 const pathWithoutLocale = pathname.replace(localePrefix, "") || "/";
+
 
   const matches = (routes: string[]) =>
     routes.some((route) =>
