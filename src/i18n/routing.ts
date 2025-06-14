@@ -1,18 +1,17 @@
-import {defineRouting} from 'next-intl/routing';
-import {createNavigation} from 'next-intl/navigation';
- 
- export const LOCALES = [ "en" , "ar" ] as const
- export type Locale = typeof LOCALES[number]
-  
+import { defineRouting } from 'next-intl/routing';
+import { createNavigation } from 'next-intl/navigation';
+
+export const LOCALES = ['en', 'ar'] as const;
+export type Locale = (typeof LOCALES)[number];
+
 export const routing = defineRouting({
-  // A list of all locales that are supported
   locales: LOCALES,
- 
-  // Used when no locale matches
-  defaultLocale: 'ar'
+  defaultLocale: 'ar',
+  messages: {
+    en: () => import('./messages/en.json'),
+    ar: () => import('./messages/ar.json')
+  }
 });
- 
-// Lightweight wrappers around Next.js' navigation APIs
-// that will consider the routing configuration
-export const {Link, redirect, usePathname, useRouter, getPathname} =
+
+export const { Link, redirect, usePathname, useRouter, getPathname } =
   createNavigation(routing);
